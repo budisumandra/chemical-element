@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Element Search</title>
+    <!-- Link to Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Element Finder</a>
+    </nav>
+
+    <!-- Container for the search and result area -->
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Search for a Chemical Element</h1>
+
+        <!-- Search Form -->
+        <div class="input-group mb-4">
+            <input type="text" id="query" class="form-control" placeholder="Enter symbol or atomic number">
+            <div class="input-group-append">
+                <button class="btn btn-primary" onclick="searchElement()">Search</button>
+            </div>
+        </div>
+
+        <!-- Result Display Area -->
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <!-- Bootstrap and Custom Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        async function searchElement() {
+            const query = document.getElementById("query").value.trim();
+            const resultDiv = document.getElementById("result");
+
+            // Clear previous results
+            resultDiv.innerHTML = "";
+
+            if (!query) {
+                resultDiv.innerHTML = `<div class="alert alert-warning">Please enter a symbol or atomic number.</div>`;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/search?query=${query}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Display the data in a Bootstrap card
+                    resultDiv.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Element: ${data.name} (${data.symbol})</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Atomic Number: ${data.atomic_number}</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><strong>Atomic Mass:</strong> ${data.atomic_mass} u</li>
+                                </ul>
+                            </div>
+                        </div>`;
+                } 
+
+                    if (data.crystal_structure) {
+                        var crystal_structure = data.crystal_structure;
+                        const crystal_keys = Object.keys(crystal_structure);
+                        const firstValue = crystal_keys[0]
+                        const secondValue = crystal_keys[1]
+                        const keys_0 = crystal_structure[firstValue]
+                        const keys_1 = crystal_structure[secondValue]
+                        resultDiv.innerHTML += `
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Crystal Structure:</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item"><strong>${firstValue}:</strong> ${keys_0}</li>
+                                    <li class="list-group-item"><strong>${secondValue}:</strong> ${keys_1}</li>
+                                    <!-- Add more properties as needed -->
+                                </ul>
+                            </div>
+                        </div>`;
+                    } 
+                
+                else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,1 +1,2 @@
 # chemical-element
+The purpose of this code is to retrieve details about various parameters that characterize elements (such as Oxygen (O), Hydrogen (H), Sulfur (S), Sodium (Na), and others). This information is displayed through a GUI. The primary package used in this project is **periodictable**.
